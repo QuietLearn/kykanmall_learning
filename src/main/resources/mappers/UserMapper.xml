@@ -151,4 +151,57 @@
       update_time = now()
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="checkName" resultType="int" parameterType="string">
+    SELECT  count(1) FROM mmall_user
+    WHERE username = #{username}
+  </select>
+  <select id="checkEmail" resultType="int" parameterType="string">
+    SELECT  count(1) FROM mmall_user
+    WHERE email = #{email}
+  </select>
+
+  <select id="login" resultMap="BaseResultMap" parameterType="map">
+  SELECT
+    *???//这样真的好么?答案就是,这样不好.
+    <include refid="Base_Column_List" />
+    FROM mmall_user
+    WHERE username = #{username}
+    and password = #{password}
+  </select>
+
+  <select id="selectQuestionByUsername" resultType="string" parameterType="string">
+    SELECT question
+    FROM mmall_user
+    WHERE username = #{username}
+  </select>
+  <select id="checkAnswer" resultType="int" parameterType="map">
+    SELECT count(1)
+    FROM mmall_user
+    WHERE username = #{username}
+    and question = #{question}
+    and answer = #{answer}
+
+  </select>
+
+  <update id="updatePasswordByUsername" parameterType="map">
+    UPDATE mmall_user
+    SET password = #{md5PasswordNew} ,update_time=now()
+    WHERE username= #{username}
+  </update>
+
+  <select id="checkPassword" resultType="int" parameterType="map">
+    SELECT count(1)
+    FROM mmall_user
+    WHERE password = #{md5PasswordOld}
+    and id = #{userId}
+
+  </select>
+  
+  <select id="checkEmailByUserId" resultType="int" parameterType="map">
+    SELECT count(1)
+    FROM mmall_user
+    WHERE email = #{email}
+    and id != #{userId}
+  </select>
 </mapper>
