@@ -116,4 +116,13 @@
       update_time = now()
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="selectByUserId" resultMap="com.mmall.dao.ProductMapper.BaseResultMap" parameterType="int">
+    SELECT <include refid="com.mmall.dao.ProductMapper.Base_Column_List" />
+    from mmall_cart cart,mmall_product pro
+    where pro LEFT JOIN cart
+    and pro.id = cart.product_id
+    and cart.user_id = #{id}
+  </select>
+
 </mapper>

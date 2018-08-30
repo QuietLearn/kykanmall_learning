@@ -1,7 +1,11 @@
 package com.mmall.pojo;
 
-import java.util.Date;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 
+import java.util.Date;
+import java.util.Objects;
+
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class Category {
     private Integer id;
 
@@ -85,5 +89,19 @@ public class Category {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Category category = (Category) o;
+        return Objects.equals(id, category.id);
+    }
+
+    @Override
+    public int hashCode() {
+        //对值进行hashcode算法，如果值相同，hashcode也一定相同
+        return Objects.hash(id);
     }
 }

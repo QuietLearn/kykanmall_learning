@@ -1,10 +1,10 @@
 package com.mmall.controller.portal;
 
 import com.mmall.common.Const;
+import com.mmall.common.ResponseCode;
 import com.mmall.common.ServerResponse;
 import com.mmall.pojo.User;
 import com.mmall.service.IUserService;
-import net.sf.jsqlparser.schema.Server;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -62,8 +62,7 @@ public class UserController {
     @RequestMapping(value = "regist.do",method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<String> regist(User user){
-        ServerResponse<String> response = iUserService.regist(user);
-        return ServerResponse.createBySuccess();
+        return iUserService.regist(user);
     }
 
     /**
@@ -83,9 +82,9 @@ public class UserController {
      * @param session
      * @return
      */
-    @RequestMapping(value = "get_user_info.do",method = RequestMethod.POST)
+    @RequestMapping(value = "get_user_info_from_session.do",method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<User> getUserInfo(HttpSession session){
+    public ServerResponse<User> getUserInfoFromSession(HttpSession session){
         User user = (User) session.getAttribute(Const.CURRENT_USER);
         if (user!=null){
             return ServerResponse.createBySuccess(user);
@@ -159,10 +158,23 @@ public class UserController {
         alterUser.setUsername(existUser.getUsername()); //username不可修改
         ServerResponse<User> infoResponse = iUserService.updateUserInfo(alterUser);
         if (infoResponse.isSuccess()){
+            //username不可修改
+            infoResponse.getData().setUsername(existUser.getUsername());
             //session更新 更新后的用户信息
             session.setAttribute(Const.CURRENT_USER,infoResponse.getData());
         }
         //将用户信息返回给前端，便于直接展示更新后的用户信息
         return infoResponse;
+    }
+
+    @RequestMapping(value = "get_user_detail.do",method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<User> getUserDetail(HttpSession session){
+        User existUser = (User) session.getAttribute(Const.CURRENT_USER);
+        if (existUser==null){
+            return  ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),"必须登录才能获取用户信息");
+        }
+        ServerResponse<User> userDetailResponse = iUserService.getUserDetail(existUser.getId());
+        return userDetailResponse;
     }
 }

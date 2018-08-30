@@ -27,7 +27,7 @@ public class PropertiesUtil {
         }
     }
 
-    public static String getProperty(String key){
+    /*public static String getProperty(String key){
         String value = props.getProperty(key.trim());
         if(StringUtils.isBlank(value)){
             return null;
@@ -43,7 +43,25 @@ public class PropertiesUtil {
         }
         return value.trim();
     }
+*/
 
+    public static String getProperty(String key){
+        if (StringUtils.isEmpty(key.trim())||StringUtils.isBlank(key.trim())){
+            return null;
+        }
+        String value = props.getProperty(key);
+        if (StringUtils.isEmpty(value.trim())||StringUtils.isBlank(value.trim())){
+            return null;
+        }
+        return value.trim();
+    }
 
+    public static String getProperty(String key,String defaultValue){
 
+        String value = props.getProperty(key.trim());
+        if(StringUtils.isBlank(value)){
+            value = defaultValue;
+        }
+        return value.trim();
+    }
 }

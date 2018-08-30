@@ -68,4 +68,18 @@ public interface IUserService {
      * @return
      */
     ServerResponse<User> updateUserInfo(User alterUser);
+
+    /**
+     * 获取用户详细信息（数据库）
+     * @param id
+     * @return
+     */
+    ServerResponse<User> getUserDetail(Integer id);
+
+    /**
+     * 检查用户是否是管理员
+     * @param user
+     * @return
+     */
+    ServerResponse checkAdmin(User user);
 }

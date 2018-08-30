@@ -105,7 +105,7 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public ServerResponse<String> checkAnswer(String username, String question, String answer) {
-        int resultCount = userMapper.checkAnswer(username,question,answer);
+        int resultCount = userMapper.checkAnswer(username,question,answer);//username防止横向越权，利用别人的问题答案修改自己密码
         if (resultCount>0){
            String token =  UUID.randomUUID().toString();
             TokenCache.setKey(TokenCache.TOKEN_PREFIX+username,token);
@@ -179,4 +179,20 @@ public class UserServiceImpl implements IUserService {
         return ServerResponse.createByErrorMessage("用户信息更新失败");
     }
 
+    public ServerResponse<User> getUserDetail(Integer id){
+
+        User user = userMapper.selectByPrimaryKey(id);
+        if (user!=null){
+            user.setPassword(StringUtils.EMPTY);
+            return ServerResponse.createBySuccess(user);
+        }
+        return ServerResponse.createByErrorMessage("该用户不存在");
+    }
+
+    public  ServerResponse checkAdmin(User user){
+        if(user.getRole().intValue() == Const.Role.ROLE_ADMIN) {
+            return ServerResponse.createBySuccess();
+        }
+        return ServerResponse.createByError();
+    }
 }
