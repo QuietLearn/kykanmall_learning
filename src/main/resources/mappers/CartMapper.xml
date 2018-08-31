@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.mmall.dao.CartMapper" >
+
   <resultMap id="BaseResultMap" type="com.mmall.pojo.Cart" >
     <constructor >
       <idArg column="id" jdbcType="INTEGER" javaType="java.lang.Integer" />
@@ -117,12 +118,49 @@
     where id = #{id,jdbcType=INTEGER}
   </update>
 
-  <select id="selectByUserId" resultMap="com.mmall.dao.ProductMapper.BaseResultMap" parameterType="int">
-    SELECT <include refid="com.mmall.dao.ProductMapper.Base_Column_List" />
-    from mmall_cart cart,mmall_product pro
-    where pro LEFT JOIN cart
-    and pro.id = cart.product_id
-    and cart.user_id = #{id}
+  <select id="selectByUserId" resultMap="BaseResultMap" parameterType="int">
+    SELECT <include refid="Base_Column_List"/>
+    from mmall_cart
+    WHERE user_id = #{userId}
   </select>
+
+  <select id="selectByUserIdProductId" resultMap="BaseResultMap" parameterType="map">
+    SELECT <include refid="Base_Column_List"/>
+    FROM mmall_cart
+    WHERE user_id = #{userId}
+    and product_id = #{productId}
+  </select>
+
+  <select id="selectUnCheckByUserId" resultType="java.lang.Integer" parameterType="int">
+    SELECT count(1)
+    FROM mmall_cart
+    WHERE user_id = #{userId}
+    and checked = 0
+  </select>
+
+  <delete id="deleteByProductIds" parameterType="map">
+    DELETE mmall_cart
+    WHERE user_id = #{userId}
+    and product_id in
+    <if test="productIdList!=null">
+      <foreach collection="productIdList" item="productId" open="(" separator="," close=")">
+        #{productId}
+      </foreach>
+    </if>
+  </delete>
+
+  <update id="checkedOrUncheckedProduct" parameterType="map">
+    update mmall_cart
+    <set>
+      checked = #{checked},
+      update_time = now(),
+    </set>
+    <where>
+      user_id  = #{userId,jdbcType=INTEGER}
+      <if test="productId!=null">
+        and product_id = #{productId}
+      </if>
+    </where>
+  </update>
 
 </mapper>

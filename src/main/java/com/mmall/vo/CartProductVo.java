@@ -6,6 +6,7 @@ public class CartProductVo {
     private Integer id;
     private Integer categoryId;
     private Integer userId;
+    private Integer productId;
     private String name;
     private String mainImage;
     private BigDecimal price;
@@ -38,6 +39,14 @@ public class CartProductVo {
 
     public void setUserId(Integer userId) {
         this.userId = userId;
+    }
+
+    public Integer getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Integer productId) {
+        this.productId = productId;
     }
 
     public Integer getChecked() {

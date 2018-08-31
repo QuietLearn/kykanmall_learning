@@ -8,6 +8,7 @@ public class CartVo {
     private boolean all_checked;
 
     private BigDecimal totalPrice;
+    private String imageHost;  //用来获取此购物车中商品图片的
 
     public List<CartProductVo> getCartProductVoList() {
         return cartProductVoList;
@@ -31,5 +32,13 @@ public class CartVo {
 
     public void setTotalPrice(BigDecimal totalPrice) {
         this.totalPrice = totalPrice;
+    }
+
+    public String getImageHost() {
+        return imageHost;
+    }
+
+    public void setImageHost(String imageHost) {
+        this.imageHost = imageHost;
     }
 }

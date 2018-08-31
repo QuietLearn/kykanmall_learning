@@ -59,7 +59,7 @@ public class FtpUtil {
                     }
                 }
             } catch (IOException e) {
-                logger.error("上传文件到文件服务器 出现异常"+e);
+                logger.error("上传文件到文件服务器 出现异常",e);
                 uploaded = false;
             } finally {
                 fis.close();
@@ -76,7 +76,7 @@ public class FtpUtil {
             ftpClient.connect(ip); //因为FTP类的构造方法已经设置了21端口了
             isSuccess = ftpClient.login(username, password);
         } catch (IOException e) {
-            logger.error("ftpClient连接ftp服务器异常"+e);
+            logger.error("ftpClient连接ftp服务器异常",e);
         }
         return isSuccess;
     }
