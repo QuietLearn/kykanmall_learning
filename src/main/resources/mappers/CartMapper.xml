@@ -138,13 +138,33 @@
     and checked = 0
   </select>
 
-  <delete id="deleteByProductIds" parameterType="map">
-    DELETE mmall_cart
+  <select id="selectCheckByUserId" resultMap="BaseResultMap" parameterType="map">
+    SELECT <include refid="Base_Column_List"/>
+    FROM mmall_cart
     WHERE user_id = #{userId}
-    and product_id in
+    and checked = #{checked}
+  </select>
+
+  <delete id="deleteByProductIds" parameterType="map">
+    DELETE FROM mmall_cart
+    WHERE user_id = #{userId}
+
     <if test="productIdList!=null">
+      and product_id in
       <foreach collection="productIdList" item="productId" open="(" separator="," close=")">
         #{productId}
+      </foreach>
+    </if>
+  </delete>
+
+  <delete id="deleteByCartList" parameterType="map">
+    DELETE FROM mmall_cart
+    WHERE user_id = #{userId}
+
+    <if test="cartList!=null">
+      and id in
+      <foreach collection="cartList" item="cart" open="(" separator="," close=")">
+        #{cart.id}
       </foreach>
     </if>
   </delete>
@@ -163,4 +183,10 @@
     </where>
   </update>
 
+  <!--如果对应user购物车里面没有物品，sum函数为空，但返回类型是int，不能接受-->
+  <select id="selectCartProductTotalCount" resultType="java.lang.Integer" parameterType="int">
+    select IFNULL(sum(quantity),0) as totalCount
+    FROM mmall_cart
+    WHERE user_id = #{userId}
+  </select>
 </mapper>

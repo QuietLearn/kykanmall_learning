@@ -31,6 +31,12 @@ public class FtpUtil {
         this.password = password;
     }
 
+    /**
+     * 对外暴露此方法，用来上传到tomcat的文件转到ftp服务器
+     * @param fileList
+     * @return
+     * @throws IOException
+     */
     public static boolean uploadFile(List<File> fileList) throws IOException {
         FtpUtil ftpUtil = new FtpUtil(ftpIp,21,ftpUser,ftpPass);
         logger.info("开始连接ftp服务器,准备上传图片");
@@ -54,7 +60,7 @@ public class FtpUtil {
                     fis = new FileInputStream(fileItem);
                     uploaded =  ftpClient.storeFile(fileItem.getName(),fis);
 //                    ftpClient.storeFile(remotePath,fis);
-                    if (!uploaded){
+                    if (!uploaded){  // 当时是因为没有在linux的 /ftpfile文件创建img并赋予ftpuser权限导致不能写入的原因
                         return uploaded;
                     }
                 }

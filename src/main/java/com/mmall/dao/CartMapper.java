@@ -1,6 +1,9 @@
 package com.mmall.dao;
 
+import com.alipay.api.domain.Car;
+import com.google.common.collect.Lists;
 import com.mmall.pojo.Cart;
+import com.mmall.pojo.OrderItem;
 import com.mmall.pojo.Product;
 import org.apache.ibatis.annotations.Param;
 
@@ -26,7 +29,13 @@ public interface CartMapper {
 
     int selectUnCheckByUserId(Integer userId);
 
+    List<Cart> selectCheckByUserId(@Param("userId") Integer userId,@Param("checked") Integer checked);
+
     int deleteByProductIds(@Param("userId") Integer userId, @Param("productIdList") List<String> productIdList);
 
+    int deleteByCartList(@Param("userId") Integer userId,@Param("cartList") List<Cart> cartList);
+
     int checkedOrUncheckedProduct(@Param("userId")Integer userId,@Param("productId")Integer productId,@Param("checked")int checked);
+
+    int selectCartProductTotalCount(Integer userId);
 }

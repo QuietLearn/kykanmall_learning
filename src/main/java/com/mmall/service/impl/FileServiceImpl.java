@@ -2,11 +2,13 @@ package com.mmall.service.impl;
 
 import com.google.common.collect.Lists;
 import com.mmall.common.Const;
+import com.mmall.dao.ProductMapper;
 import com.mmall.pojo.User;
 import com.mmall.service.IFileService;
 import com.mmall.util.FtpUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,6 +22,9 @@ import java.util.UUID;
 public class FileServiceImpl implements IFileService {
 
     private Logger logger = LoggerFactory.getLogger(FileServiceImpl.class);
+
+    @Autowired
+    private ProductMapper productMapper;
 
     public String uploadPhoto(MultipartFile file, String path){
         String originalFilename = file.getOriginalFilename();
@@ -44,13 +49,16 @@ public class FileServiceImpl implements IFileService {
             /*List<File> fileList =  Lists.newArrayList();
             fileList.add(targetFile);*/
             //文件已经上传成功了
-            if (!FtpUtil.uploadFile(Lists.newArrayList(targetFile))){
-                return "";
+
+            // list为以后多文件上传扩展使用
+            if (!FtpUtil.uploadFile(Lists.newArrayList(targetFile))){// 当时是因为没有在linux的 /ftpfile文件创建img并赋予ftpuser权限导致不能写入的原因
+                return ""; //如果没有将文件写入ftp服务器，返回的文件名为""代表失败，因为返回string，不知道如何表示错误
             }
+
             //已经上传到ftp服务器上
 
         } catch (IOException e) {
-            logger.error("文件上传到目标目录异常"+e);
+            logger.error("文件上传到目标目录异常",e);
             return null;
         } finally {
             targetFile.delete();

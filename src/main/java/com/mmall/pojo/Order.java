@@ -1,6 +1,7 @@
 package com.mmall.pojo;
 
 import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.Date;
 
 public class Order {
@@ -164,4 +165,5 @@ public class Order {
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
     }
+
 }

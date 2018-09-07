@@ -23,10 +23,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
 
+
+@Service("iCartService")
 public class ICartServiceImpl implements ICartService {
 
     private Logger logger = LoggerFactory.getLogger(ICartServiceImpl.class);
@@ -69,15 +72,19 @@ public class ICartServiceImpl implements ICartService {
             cartItem.setQuantity(cart.getQuantity()+count);
             cartMapper.updateByPrimaryKeySelective(cartItem);
         } else {
-            //这个产品不在这个购物车里,需要新增一个这个产品的记录
-            cartItem.setProductId(cart.getProductId());
-            cartItem.setUserId(cart.getUserId());
-            cartItem.setChecked(Const.Cart.CHECKED);
-            cartItem.setQuantity(count);
-            int insertCount = cartMapper.insert(cartItem);
-            if (insertCount <= 0 ){
-                return ServerResponse.createByErrorMessage("购物车新添商品失败");
+            if (product.getStatus()==Const.productStatusCode.ONSALE.getCode()){
+                //这个产品不在这个购物车里,需要新增一个这个产品的记录
+                cartItem.setProductId(productId);
+                cartItem.setUserId(userId);
+                cartItem.setChecked(Const.Cart.CHECKED);
+                cartItem.setQuantity(count);
+                int insertCount = cartMapper.insert(cartItem);
+                if (insertCount <= 0 ){
+                    return ServerResponse.createByErrorMessage("购物车新添商品失败");
+                }
             }
+
+            return ServerResponse.createByErrorMessage("购物车新增的此商品已下架");
         }
 
         return this.list(userId);
@@ -137,7 +144,14 @@ public class ICartServiceImpl implements ICartService {
         return ServerResponse.createByErrorMessage("选择勾选购物车中商品异常");
     }
 
+    public ServerResponse<Integer> getCartProductTotalCount(Integer userId){
+        if (userId ==null){
+            return ServerResponse.createBySuccess(0);
+        }
+        int cartProductTotalCount = cartMapper.selectCartProductTotalCount(userId);
 
+        return ServerResponse.createBySuccess(cartProductTotalCount);
+    }
 
 
     private CartVo getCartVoLimit(Integer userId){
