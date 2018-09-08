@@ -15,7 +15,7 @@ public class CartProductVo {
 
     private Integer checked;
     private Integer status;
-    private String limitQuantity;
+    private String limitQuantity; //库存所限制的购买数量？
 
     public Integer getId() {
         return id;

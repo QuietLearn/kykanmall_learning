@@ -1,7 +1,9 @@
 package com.mmall.service;
 
+import com.github.pagehelper.PageInfo;
 import com.mmall.common.ServerResponse;
 import com.mmall.pojo.Order;
+import com.mmall.vo.OrderVo;
 
 import java.util.Map;
 
@@ -24,5 +26,27 @@ public interface IOrderService {
     ServerResponse queryOrderPayStatus(Integer userId,Long orderNo);
 
 
-    ServerResponse generateOrderVo(Integer userId,Integer shippingId);
+    ServerResponse<OrderVo> generateOrderVo(Integer userId, Integer shippingId);
+
+    ServerResponse cancelOrder(Integer userId, Long orderNo);
+
+    /**
+     * 获取购物车选中商品的信息
+     * @param userId
+     * @return
+     */
+    ServerResponse getCartCheckProduct(Integer userId);
+
+    ServerResponse<PageInfo> userListOrder(Integer userId, Integer pageNum, Integer pageSize);
+
+    ServerResponse getOrderDetail(Integer userId,Long orderNo);
+
+    //backend
+    ServerResponse<PageInfo> adminListOrder(Integer pageNum,Integer pageSize);
+
+    ServerResponse<OrderVo> manageDetail(Long orderNo);
+
+    ServerResponse manageCriteriaQuery(Long orderNo,int pageNum,int pageSize);
+
+    ServerResponse manageSendGoods(Long orderNo);
 }

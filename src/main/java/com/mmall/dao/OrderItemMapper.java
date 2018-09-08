@@ -20,5 +20,8 @@ public interface OrderItemMapper {
 
     List<OrderItem> selectByOrderNoUserId(@Param("orderNo") Long orderNo,@Param("userId") Integer userId);
 
+    List<OrderItem> selectByOrderNo(@Param("orderNo") Long orderNo); //为了以后服务化把前台和后台管理拆开
+
+
     int batchInsert(@Param("orderItemList") List<OrderItem> orderItemList);
 }

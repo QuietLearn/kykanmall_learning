@@ -212,4 +212,29 @@
     </where>
 
   </select>
+
+  <select id="selectByUserId" resultMap="BaseResultMap" parameterType="int">
+    SELECT <include refid="Base_Column_List"/>
+    FROM mmall_order
+    WHERE user_id = #{userId}
+    order by create_time desc
+  </select>
+
+  <select id="selectAll" resultMap="BaseResultMap" >
+    SELECT <include refid="Base_Column_List"/>
+    FROM mmall_order
+    order by create_time DESC
+  </select>
+
+  <select id="selectByOrderNo" resultMap="BaseResultMap" parameterType="long">
+    SELECT <include refid="Base_Column_List"/>
+    FROM  mmall_order
+    where order_no = #{orderNo}
+  </select>
+
+  <!--<select id="selectByReceiveName" resultMap="BaseResultMap">
+    SELECT <include refid="Base_Column_List"/>
+    FROM mmall_order
+    WHERE product_name like #{}
+  </select>-->
 </mapper>

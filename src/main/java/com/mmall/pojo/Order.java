@@ -166,4 +166,9 @@ public class Order {
         this.updateTime = updateTime;
     }
 
+
+    @Override
+    public String toString() {
+        return new StringBuilder().append("orderNo:").append(orderNo).append(",status:").append(status).toString();
+    }
 }

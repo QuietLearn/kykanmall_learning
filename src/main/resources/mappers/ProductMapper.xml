@@ -212,4 +212,12 @@
         #{caragoryItem}
       </foreach>
   </select>
+
+  <update id="updateStockByProductId" parameterType="map">
+    UPDATE mmall_product
+    <trim prefix="set" suffixOverrides=",">
+      stock = stock + #{quantity}
+    </trim>
+    where id = #{productId}
+  </update>
 </mapper>
