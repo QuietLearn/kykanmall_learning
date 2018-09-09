@@ -8,7 +8,7 @@
 *.orig
 
 #alipay demo
-src/main/java/com/alipay/demo/trade
+
 
 #maven ignore
 target/
