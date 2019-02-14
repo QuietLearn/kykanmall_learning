@@ -5,7 +5,7 @@ import com.mmall.pojo.Shipping;
 
 public interface IShippingService {
 
-    ServerResponse<Integer> add(Integer userId, Shipping shipping);
+    ServerResponse add(Integer userId, Shipping shipping);
 
     ServerResponse<Integer> update(Shipping shipping,Integer userId);
 

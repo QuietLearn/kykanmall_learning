@@ -17,9 +17,8 @@ import com.mmall.util.DateTimeUtil;
 import com.mmall.util.PropertiesUtil;
 import com.mmall.vo.ProductDetailVo;
 import com.mmall.vo.ProductListVo;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,9 +29,9 @@ import java.util.List;
 
 
 @Service("iProductService")
+@Slf4j
 public class ProductServiceImpl implements IProductService {
 
-    private Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
 
     @Autowired
     private ProductMapper productMapper;
@@ -133,7 +132,7 @@ public class ProductServiceImpl implements IProductService {
         Category category = categoryMapper.selectByPrimaryKey(product.getCategoryId());
         if (category==null){
             productDetailVo.setParentCategoryId(0);
-            logger.info("product转换为detailVo，product的categoryid获取不到category，是错误值，所以默认父品类id为0");
+            log.info("product转换为detailVo，product的categoryid获取不到category，是错误值，所以默认父品类id为0");
         } else {
             productDetailVo.setParentCategoryId(category.getParentId());
         }
@@ -193,7 +192,7 @@ public class ProductServiceImpl implements IProductService {
             productName = builder.append("%").append(productName).append("%").toString();
         }
 
-        List<Product> productList = productMapper.selectListByProductNameOrId(productName,productId);//先让pagehelper用aop切入limit、offset完成并拿到分页信息
+        List<Product> productList = productMapper.selectListByProductNameOrId(StringUtils.isBlank(productName)?null:productName,productId);//先让pagehelper用aop切入limit、offset完成并拿到分页信息
         List<ProductListVo> productListVoList = Lists.newArrayList();
         for(Product productItem : productList){
             ProductListVo productListVo = assembleProductListVo(productItem);
@@ -243,6 +242,7 @@ public class ProductServiceImpl implements IProductService {
                 PageInfo pageInfo = new PageInfo(productListVoList);
                 return ServerResponse.createBySuccess(pageInfo);
             }*/
+
            caragoryList = iCategoryService.get_deep_category(category.getId()).getData();
         }
 

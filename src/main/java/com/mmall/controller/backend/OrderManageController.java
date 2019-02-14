@@ -38,6 +38,7 @@ public class OrderManageController {
             return iOrderService.adminListOrder(pageNum,pageSize);
         }
         return  ServerResponse.createByErrorMessage("该用户没有权限");
+
     }
 
 
@@ -52,6 +53,7 @@ public class OrderManageController {
         if (iUserService.checkAdmin(user).isSuccess()){
             return iOrderService.manageDetail(orderNo);
         }
+
         return  ServerResponse.createByErrorMessage("该用户没有权限");
     }
 

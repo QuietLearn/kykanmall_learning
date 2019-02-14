@@ -2,25 +2,29 @@ package com.mmall.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.google.common.collect.Maps;
 import com.mmall.common.ResponseCode;
 import com.mmall.common.ServerResponse;
 import com.mmall.dao.ShippingMapper;
 import com.mmall.pojo.Shipping;
 import com.mmall.service.IShippingService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service("iShippingService")
+@Slf4j
 public class ShippingServiceImpl implements IShippingService {
 
     @Autowired
     private ShippingMapper shippingMapper;
 
 
-    public ServerResponse<Integer> add(Integer userId, Shipping shipping){//shipping不为空，因为对象参数绑定，springmvc会先new一个对象
+    public ServerResponse add(Integer userId, Shipping shipping){//shipping不为空，因为对象参数绑定，springmvc会先new一个对象
         if (shipping.getId()!=null){
             Shipping shippingItem = shippingMapper.selectByPrimaryKey(shipping.getId());
             if (shippingItem!=null){
@@ -31,7 +35,9 @@ public class ShippingServiceImpl implements IShippingService {
         shipping.setUserId(userId);
         int insertCount = shippingMapper.insert(shipping);
         if (insertCount>0){
-            return ServerResponse.createBySuccess("新增地址成功",shipping.getId());
+            Map result = Maps.newHashMap();
+            result.put("shippingId",shipping.getId()); // shippingId通过mybatis自动生成主键获得
+            return ServerResponse.createBySuccess("新增地址成功",result);
         }
 
         return ServerResponse.createByErrorMessage("新增地址失败");

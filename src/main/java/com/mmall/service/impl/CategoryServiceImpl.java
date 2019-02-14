@@ -6,22 +6,19 @@ import com.mmall.common.ServerResponse;
 import com.mmall.dao.CategoryMapper;
 import com.mmall.pojo.Category;
 import com.mmall.service.ICategoryService;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.schema.Server;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @Service("iCategoryService")
+@Slf4j
 public class CategoryServiceImpl implements ICategoryService {
     //logback日志
-    private Logger logger = LoggerFactory.getLogger(CategoryServiceImpl.class);
 
     @Autowired
     private CategoryMapper categoryMapper;
@@ -63,7 +60,7 @@ public class CategoryServiceImpl implements ICategoryService {
         List<Category> categories = categoryMapper.selectChildCategoryByParentId(categoryId);
 
         if (CollectionUtils.isEmpty(categories)){
-            logger.info("此分类下没有子分类");//没有子节点不需要报错，只能说没有，打印一行日志即可
+            log.info("此分类下没有子分类");//没有子节点不需要报错，只能说没有，打印一行日志即可
         }
         return ServerResponse.createBySuccess(categories);
     }
@@ -106,7 +103,7 @@ public class CategoryServiceImpl implements ICategoryService {
         List<Integer> categoryIdList = Lists.newArrayList();
         if (CollectionUtils.isNotEmpty(categorySet)){ //其实不用判断因为[]不会再foreach取值时报空指针异常
             for (Category categoryItem:categorySet) {
-                categoryIdList.add(categoryItem.getId());//因为list有序，查找比较方便，hashset只是用来排重
+                categoryIdList.add(categoryItem.getId());//因为list有序，查找?比较方便，hashset只是用来排重
             }
             return ServerResponse.createBySuccess(categoryIdList);
         }

@@ -12,7 +12,7 @@ public class DateTimeUtil {
     //joda-time
     //str->Date
     //Date->str
-    private static String STANDRAD_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    public static String STANDARD_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     public static String dateToStr(Date date, String formatStr){
         if (date == null){
@@ -32,12 +32,13 @@ public class DateTimeUtil {
         if (date == null){
             return StringUtils.EMPTY;
         }
+
         DateTime dateTime = new DateTime(date);
-        return dateTime.toString(STANDRAD_FORMAT);
+        return dateTime.toString(STANDARD_FORMAT);
     }
 
     public static Date strToDate(String dateTimeStr){
-        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern(STANDRAD_FORMAT);
+        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern(STANDARD_FORMAT);
         DateTime dateTime = dateTimeFormatter.parseDateTime(dateTimeStr);
         return dateTime.toDate();
     }

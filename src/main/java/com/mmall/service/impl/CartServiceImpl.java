@@ -1,6 +1,5 @@
 package com.mmall.service.impl;
 
-import com.github.pagehelper.StringUtil;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.mmall.common.Const;
@@ -17,10 +16,8 @@ import com.mmall.util.BigDecimalUtil;
 import com.mmall.util.PropertiesUtil;
 import com.mmall.vo.CartProductVo;
 import com.mmall.vo.CartVo;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,9 +27,9 @@ import java.util.List;
 
 
 @Service("iCartService")
-public class ICartServiceImpl implements ICartService {
+@Slf4j
+public class CartServiceImpl implements ICartService {
 
-    private Logger logger = LoggerFactory.getLogger(ICartServiceImpl.class);
 
     @Autowired
     private UserMapper userMapper;
@@ -120,7 +117,7 @@ public class ICartServiceImpl implements ICartService {
         try{
             productIdList = Splitter.on(",").splitToList(productIds); //会检查null不检查 " "，如果null报空指针异常
         } catch (Exception e){
-            logger.error("productIds为空",e);
+            log.error("productIds为空",e);
         }
         if (CollectionUtils.isEmpty(productIdList)){
             return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEAGAL_ARGUMENT.getCode(),ResponseCode.ILLEAGAL_ARGUMENT.getDesc());

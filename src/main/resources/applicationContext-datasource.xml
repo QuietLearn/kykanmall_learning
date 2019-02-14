@@ -78,7 +78,7 @@
     </bean>
 
     <!--mapperScannerConfigurer转换器，名字默认，spring会加载这个名字的bean，
-    ，将接口转化成bean（如果在sql映射文件中定义过namespace），先通过xml生成实现类，在反射，名字就默认类型，头字母小写-->
+    ，将接口转化成对象（如果在sql xml映射文件中定义过namespace），先通过xml生成实现类，在反射生成对象，名字就默认类型，头字母小写-->
     <bean name="mapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
         <property name="basePackage" value="com.mmall.dao"/>
     </bean>

@@ -25,10 +25,9 @@ import com.mmall.util.DateTimeUtil;
 import com.mmall.util.FtpUtil;
 import com.mmall.util.PropertiesUtil;
 import com.mmall.vo.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -41,9 +40,9 @@ import java.math.BigDecimal;
 import java.util.*;
 
 @Service("iOrderService")
+@Slf4j
 public class OrderServiceImpl implements IOrderService {
 
-    private static final Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
     private static AlipayTradeService tradeService;
     static {
         /** 一定要在创建AlipayTradeService之前调用Configs.init()设置默认参数
@@ -119,9 +118,9 @@ public class OrderServiceImpl implements IOrderService {
 
     private OrderVo assemOrderVo(Order order,List<OrderItem> orderItemList){
         if (order==null||CollectionUtils.isEmpty(orderItemList)){
-            //logger.info(String.format("subCode:%s, subMsg:%s", response.getSubCode(), response.getSubMsg()));
+            //log.info(String.format("subCode:%s, subMsg:%s", response.getSubCode(), response.getSubMsg()));
             //order{}，旧文件名{}，新文件名{}
-            logger.info("（开始）装配orderVo失败（可能order里面没有商品）,传入order{},orderItemList是否为empty：{}",order,CollectionUtils.isEmpty(orderItemList));
+            log.info("（开始）装配orderVo失败（可能order里面没有商品）,传入order{},orderItemList是否为empty：{}",order,CollectionUtils.isEmpty(orderItemList));
         }
         OrderVo orderVo = new OrderVo();
 
@@ -167,7 +166,11 @@ public class OrderServiceImpl implements IOrderService {
     private void reduceProductStock(List<OrderItem> orderItemList){
         for(OrderItem orderItem : orderItemList){
             Product product = productMapper.selectByPrimaryKey(orderItem.getProductId());
-            product.setStock(product.getStock()-orderItem.getQuantity());
+            int stock = product.getStock() - orderItem.getQuantity();
+            if(stock>0){
+                product.setStock(stock);
+            }
+
             productMapper.updateByPrimaryKeySelective(product); // 最好使用in +foreach是sql查询只用1条语句
         }
     }
@@ -216,9 +219,6 @@ public class OrderServiceImpl implements IOrderService {
         }
         return orderTotalPrice;
     }
-
-
-
 
 
     private ServerResponse assemOrderItemList(List<Cart> cartList,Long orderNo){
@@ -507,7 +507,7 @@ public class OrderServiceImpl implements IOrderService {
             String undiscountableAmount = "0";
 
             // 卖家支付宝账号ID，用于支持一个签约账号下支持打款到不同的收款账号，(打款到sellerId对应的支付宝账号)
-            // 如果该字段为空，则默认为与支付宝签约的商户的PID，也就是appid对应的PID
+            // 如果该字段为空，则默认为与支付宝签约的商户的PID，也就是appid对应的PID uid
             String sellerId = "";
 
             // 订单描述，可以对交易或商品进行一个详细地描述，比如填写"购买商品2件共15.00元"
@@ -540,7 +540,7 @@ public class OrderServiceImpl implements IOrderService {
             }
 
 
-            // 创建扫码支付请求builder，设置请求参数
+            // 创建扫码支付请求builder，设置请求参数，设置在bizContent中
             AlipayTradePrecreateRequestBuilder builder = new AlipayTradePrecreateRequestBuilder()
                     .setSubject(subject).setTotalAmount(totalAmount).setOutTradeNo(outTradeNo)
                     .setUndiscountableAmount(undiscountableAmount).setSellerId(sellerId).setBody(body)
@@ -559,7 +559,7 @@ public class OrderServiceImpl implements IOrderService {
                         uplodaFile.setWritable(true);
                         uplodaFile.mkdirs();
                     }
-                    logger.info("支付宝预下单成功: )");
+                    log.info("支付宝预下单成功: )");
 
                     AlipayTradePrecreateResponse response = result.getResponse();
                     dumpResponse(response);
@@ -569,28 +569,28 @@ public class OrderServiceImpl implements IOrderService {
                             response.getOutTradeNo());  // path需要是String类型的
                     String qrFileName = String.format("qr-%s.png",response.getOutTradeNo());
                     ZxingUtils.getQRCodeImge(response.getQrCode(),256,qrPath); // 需要防止在目标string路径下生成二维码图片时路径不存在的问题
-                    //logger.info("qrPath:" + qrPath);
+                    //log.info("qrPath:" + qrPath);
                     //                ZxingUtils.getQRCodeImge(response.getQrCode(), 256, filePath);
                     File targetFile =new File(path,qrFileName);
                     try {
                         FtpUtil.uploadFile(Lists.<File>newArrayList(targetFile));
                     } catch (IOException e) {
-                        logger.error("上传二维码异常",e);
+                        log.error("上传二维码异常",e);
                     }
-                    logger.info("qrPath:" + qrPath);
+                    log.info("qrPath:" + qrPath);
                     resultMap.put("qrPath",PropertiesUtil.getProperty("ftp.server.http.prefix")+targetFile.getName());
                     return ServerResponse.createBySuccess(resultMap);
 
                 case FAILED:
-                    logger.error("支付宝预下单失败!!!");
+                    log.error("支付宝预下单失败!!!");
                     return ServerResponse.createByErrorMessage("支付宝预下单失败!!!");
 
                 case UNKNOWN:
-                    logger.error("系统异常，预下单状态未知!!!");
+                    log.error("系统异常，预下单状态未知!!!");
                     return ServerResponse.createByErrorMessage("系统异常，预下单状态未知!!!");
 
                 default:
-                    logger.error("不支持的交易状态，交易返回异常!!!");
+                    log.error("不支持的交易状态，交易返回异常!!!");
                     return ServerResponse.createByErrorMessage("不支持的交易状态，交易返回异常!!!");
             }
 
@@ -603,12 +603,12 @@ public class OrderServiceImpl implements IOrderService {
     // 简单打印应答
     private void dumpResponse(AlipayResponse response) {
         if (response != null) {
-            logger.info(String.format("code:%s, msg:%s", response.getCode(), response.getMsg()));
+            log.info(String.format("code:%s, msg:%s", response.getCode(), response.getMsg()));
             if (StringUtils.isNotEmpty(response.getSubCode())) {
-                logger.info(String.format("subCode:%s, subMsg:%s", response.getSubCode(),
+                log.info(String.format("subCode:%s, subMsg:%s", response.getSubCode(),
                         response.getSubMsg()));
             }
-            logger.info("body:" + response.getBody());
+            log.info("body:" + response.getBody());
         }
     }
 
@@ -619,11 +619,11 @@ public class OrderServiceImpl implements IOrderService {
         String trade_status = params.get("trade_status"); //获取支付宝端的交易状态
         Order orderItem = orderMapper.selectByUserIdAndOrderNo(null, Long.valueOf(out_trade_no));
         if(orderItem==null){
-            logger.error("商户找不到该订单");
+            log.error("商户找不到该订单");
             return ServerResponse.createByErrorMessage("非快乐慕商城的订单,回调忽略");
         }
         if (orderItem.getStatus()>= Const.OrderStatusEnum.PAID.getCode()){
-            logger.error("支付宝重复回调");
+            log.error("支付宝重复回调");
             return ServerResponse.createByErrorMessage("订单已修改状态，过滤重复通知");
         }
 
@@ -653,7 +653,7 @@ public class OrderServiceImpl implements IOrderService {
         }
         Order order = orderMapper.selectByUserIdAndOrderNo(userId, orderNo);
         if (order==null){
-            logger.error("数据库中找不到该订单");
+            log.error("数据库中找不到该订单");
             return ServerResponse.createByErrorMessage("找不到该订单");
         }
         if (order.getStatus()>= Const.OrderStatusEnum.PAID.getCode()){

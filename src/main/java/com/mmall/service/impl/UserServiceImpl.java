@@ -107,7 +107,7 @@ public class UserServiceImpl implements IUserService {
     public ServerResponse<String> checkAnswer(String username, String question, String answer) {
         int resultCount = userMapper.checkAnswer(username,question,answer);//username防止横向越权，利用别人的问题答案修改自己密码
         if (resultCount>0){
-           String token =  UUID.randomUUID().toString();
+            String token =  UUID.randomUUID().toString();
             TokenCache.setKey(TokenCache.TOKEN_PREFIX+username,token);
             return ServerResponse.createBySuccess(token);
         }

@@ -1,18 +1,17 @@
 package com.mmall.Controller;
 
 import com.mmall.common.TokenCache;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.StringReader;
 import java.text.MessageFormat;
 
+@Slf4j
 public class TestController {
 
-    private Logger logger = LoggerFactory.getLogger(TestController.class);
 
     @RequestMapping(value = "set_cache.do")
     @ResponseBody
@@ -30,9 +29,9 @@ public class TestController {
     @RequestMapping(value = "test.do")
     @ResponseBody
     public String test(String str){
-        logger.info("testinfo");
-        logger.warn("testwarn");
-        logger.warn("testerror");
+        log.info("testinfo");
+        log.warn("testwarn");
+        log.warn("testerror");
         return "testValue:" +str;
     }
 }

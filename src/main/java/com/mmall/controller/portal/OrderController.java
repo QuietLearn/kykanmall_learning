@@ -15,10 +15,7 @@ import com.mmall.pojo.OrderItem;
 import com.mmall.pojo.Product;
 import com.mmall.pojo.User;
 import com.mmall.service.IOrderService;
-import com.mmall.util.DateTimeUtil;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,9 +30,9 @@ import java.util.Map;
 
 @RequestMapping("/order/")
 @Controller
+@Slf4j
 public class OrderController {
 
-    private Logger logger = LoggerFactory.getLogger(OrderController.class);
 
     @Autowired
     private IOrderService iOrderService;
@@ -118,24 +115,27 @@ public class OrderController {
             String[] valueArray = requestParams.get(name);
             String value ="";
             for (int i = 0; i < valueArray.length; i++) {
-                value =  i==valueArray.length? value + valueArray[i]+",":value + valueArray[i];
+                value =  i==valueArray.length-1? value + valueArray[i]:value + valueArray[i]+",";
             }
             //乱码解决，这段代码在出现乱码时使用
             //valueStr = new String(valueStr.getBytes("ISO-8859-1"), "utf-8");因为tomcat的setting.xml设置过了
             params.put(name,value);
         }
-        logger.info("支付宝回调，sign:{},trade_status:{},参数:{}",params.get("sign"),params.get("trade_status"),params.toString());//map自带tostring
+        log.info("支付宝回调，sign:{},trade_status:{},参数:{}",params.get("sign"),params.get("trade_status"),params.toString());//map自带tostring
+
+        //非常重要,验证回调的正确性,是不是支付宝发的.并且呢还要避免重复通知.
 
         params.remove("sign_type");
         try {
+            //好像因为空格的原因老是验签失败
             boolean alipayRSACheckedV2 = AlipaySignature.rsaCheckV2(params, Configs.getAlipayPublicKey(), "utf-8", Configs.getSignType());
             if(!alipayRSACheckedV2){
-                logger.error("验签失败，不是支付宝的回调");
+                log.error("验签失败，不是支付宝的回调");
                 return ServerResponse.createByErrorMessage("验签不通过，不是支付宝传过来的数据");
             }
-            logger.info("验签正确，准备根据支付宝回调来的参数做交易状态等的处理");
+            log.info("验签正确，准备根据支付宝回调来的参数做交易状态等的处理");
         } catch (AlipayApiException e) {
-            logger.error("支付宝验签回调参数异常",e);
+            log.error("支付宝验签回调参数异常",e);
         }
 
 
@@ -144,7 +144,7 @@ public class OrderController {
 
         ServerResponse response = iOrderService.alipayCallback(params);
         if (response.isSuccess()){
-            logger.info("商户端回调函数处理数据成功，返回success给支付宝服务端结束通知");
+            log.info("商户端回调函数处理数据成功，返回success给支付宝服务端结束通知");
             return Const.AlipayCallbackStatus.RESPONSE_SUCCESS;
         }
 

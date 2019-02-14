@@ -20,6 +20,7 @@ import javax.servlet.http.HttpSession;
 @RequestMapping("/cart/")
 @Controller
 public class CartController {
+    int x[]={1,2,3};
 
     @Autowired
     private ICartService icartService;

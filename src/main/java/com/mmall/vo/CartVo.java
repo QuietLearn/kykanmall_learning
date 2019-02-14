@@ -5,7 +5,7 @@ import java.util.List;
 
 public class CartVo {
     private List<CartProductVo> cartProductVoList;
-    private boolean all_checked;
+    private boolean all_checked;//是否已经都勾选
 
     private BigDecimal totalPrice;
     private String imageHost;  //用来获取此购物车中商品图片的

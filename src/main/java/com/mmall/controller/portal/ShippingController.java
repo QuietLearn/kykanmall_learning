@@ -23,7 +23,7 @@ public class ShippingController {
 
     @RequestMapping("add.do")
     @ResponseBody
-    public ServerResponse<Integer> add(HttpSession session, Shipping shipping){
+    public ServerResponse add(HttpSession session, Shipping shipping){
         User user = (User) session.getAttribute(Const.CURRENT_USER);
 
         if (user==null){

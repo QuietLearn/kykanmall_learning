@@ -32,7 +32,8 @@
        <!-- <File>/developer/apache-tomcat-7.0.73/logs/error.log</File>-->
         <File>F:\\安装配置文件\\Apache Software Foundation\\Tomcat 8.0.50\\logs\\error.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-           <!-- <fileNamePattern>/devsoft/apache-tomcat-7.0.73/logs/error.log.%d{yyyy-MM-dd}.gz</fileNamePattern>-->
+            <!--与前面file路径保持一致，以时间 排序   .gz表示压缩 -->
+            <fileNamePattern>F:\\安装配置文件\\Apache Software Foundation\\Tomcat 8.0.50\\logs\\error.log.%d{yyyy-MM-dd}.gz</fileNamePattern>
             <!--<fileNamePattern>d:/mmalllog/error.log.%d{yyyy-MM-dd}.gz</fileNamePattern>-->
             <append>true</append>
             <maxHistory>10</maxHistory>
