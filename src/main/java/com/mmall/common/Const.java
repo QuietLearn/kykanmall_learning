@@ -11,6 +11,10 @@ public class Const {
     public static final String EMAIL = "email";
 
     public static final int ONSALE_CODE = 1 ;
+
+    public interface RedisCacheExtime{
+        int REDIS_SESSION_EXTIME = 60 * 30;// 30 min
+    }
     public interface Role{
         int ROLE_CUSTOMER = 0; //普通用户
         int ROLE_ADMIN = 1;//管理员
