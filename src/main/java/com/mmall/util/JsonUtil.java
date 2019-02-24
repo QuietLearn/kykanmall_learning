@@ -1,8 +1,6 @@
 package com.mmall.util;
 
-import com.google.common.collect.Lists;
 import com.mmall.pojo.TestPojo;
-import com.mmall.pojo.User;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.map.DeserializationConfig;
@@ -13,7 +11,6 @@ import org.codehaus.jackson.type.JavaType;
 import org.codehaus.jackson.type.TypeReference;
 
 import java.text.SimpleDateFormat;
-import java.util.List;
 
 @Slf4j
 public class JsonUtil {

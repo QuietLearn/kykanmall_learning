@@ -2,6 +2,9 @@
 
 <html>
 <body>
+<h1>Tocmat1</h1>
+<h1>Tocmat1</h1>
+<h1>Tocmat1</h1>
     springmvc图片上传到ftp服务器
     <form name="form1" enctype="multipart/form-data" action="/manage/product/upload_photo.do" method="post">
         <input name="uploadFile" type="file"/>
