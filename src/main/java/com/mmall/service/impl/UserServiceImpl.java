@@ -1,12 +1,14 @@
 package com.mmall.service.impl;
 
 import com.mmall.common.Const;
+import com.mmall.common.RedisPool;
 import com.mmall.common.ServerResponse;
 import com.mmall.common.TokenCache;
 import com.mmall.dao.UserMapper;
 import com.mmall.pojo.User;
 import com.mmall.service.IUserService;
 import com.mmall.util.MD5Util;
+import com.mmall.util.RedisPoolUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -105,11 +107,13 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public ServerResponse<String> checkAnswer(String username, String question, String answer) {
-        int resultCount = userMapper.checkAnswer(username,question,answer);//username防止横向越权，利用别人的问题答案修改自己密码
+        //username防止横向越权，利用别人的问题答案修改自己密码
+        int resultCount = userMapper.checkAnswer(username,question,answer);
         if (resultCount>0){
-            String token =  UUID.randomUUID().toString();
-            TokenCache.setKey(TokenCache.TOKEN_PREFIX+username,token);
-            return ServerResponse.createBySuccess(token);
+            String forgetToken =  UUID.randomUUID().toString();
+            //TokenCache.setKey(TokenCache.TOKEN_PREFIX+username,forgetToken);
+            RedisPoolUtil.setEx(Const.TOKEN_PREFIX+username,forgetToken,60*60*12);
+            return ServerResponse.createBySuccess(forgetToken);
         }
         return ServerResponse.createByErrorMessage("问题的答案不正确");
     }
@@ -124,7 +128,8 @@ public class UserServiceImpl implements IUserService {
             return ServerResponse.createByErrorMessage("token为空，请重新回答问题获取");
         }
 
-        String token = TokenCache.getKey(TokenCache.TOKEN_PREFIX+username);
+        //String token = TokenCache.getKey(TokenCache.TOKEN_PREFIX+username);
+        String token =  RedisPoolUtil.get(Const.TOKEN_PREFIX+username);
         if (StringUtils.equals(forgetToken,token)){
             String md5PasswordNew = MD5Util.MD5EncodeUtf8(passwordNew);
             int rowCount = userMapper.updatePasswordByUsername(username,md5PasswordNew);

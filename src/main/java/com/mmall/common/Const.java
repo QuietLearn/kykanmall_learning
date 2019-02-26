@@ -15,6 +15,7 @@ public class Const {
 
     public static final int ONSALE_CODE = 1 ;
 
+    public static final String TOKEN_PREFIX = "token_";
     public interface RedisCacheExtime{
         int REDIS_SESSION_EXTIME = 60 * 30;// 30 min
     }

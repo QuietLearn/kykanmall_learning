@@ -184,6 +184,9 @@ public class UserController {
         //User existUser = (User) session.getAttribute(Const.CURRENT_USER);
 
         String loginToken = CookieUtil.readLoginLoken(request);
+        if(StringUtils.isBlank(loginToken)){
+            return ServerResponse.createByErrorMessage("用户未登录");
+        }
         String userStr = RedisPoolUtil.get(loginToken);
         User existUser = JsonUtil.Json2Obj(userStr, User.class);
 
@@ -197,8 +200,8 @@ public class UserController {
             //username不可修改
             infoResponse.getData().setUsername(existUser.getUsername());
             //session更新 更新后的用户信息
-            String logintToken = CookieUtil.readLoginLoken(request);
-            RedisPoolUtil.set(loginToken,JsonUtil.obj2Json(infoResponse.getData()));
+
+            RedisPoolUtil.setEx(loginToken,JsonUtil.obj2Json(infoResponse.getData()),Const.RedisCacheExtime.REDIS_SESSION_EXTIME);
             //session.setAttribute(Const.CURRENT_USER,infoResponse.getData());
         }
         //将用户信息返回给前端，便于直接展示更新后的用户信息
