@@ -1,3 +1,6 @@
+/**
+ * 业务上的common
+ */
 package com.mmall.common;
 
 import com.google.common.collect.Sets;
