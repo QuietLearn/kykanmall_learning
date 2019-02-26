@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 @Slf4j
 public class CookieUtil {
     //同级别的域名访问(读)不到同级别域名domain下的cookie
-    private final static String COOKIE_DOMAIN=".happymmall.com";
+    private final static String COOKIE_DOMAIN="happymmall.com";
     private final static String COOKIE_NAME="mmall_login_token";
     //token就是cookie--jsessionId
 
@@ -29,7 +29,7 @@ public class CookieUtil {
         //单位是秒。
         //如果这个maxage不设置的话，cookie就不会写入硬盘，而是写在内存。只在当前页面有效。
         cookie.setMaxAge(60 * 60 * 24 * 365);//如果是-1，代表永久
-        log.info("write cookieName:{},cookieValue:{}",cookie.git etName(),cookie.getValue());
+        log.info("write cookieName:{},cookieValue:{}",cookie.getName(),cookie.getValue());
         response.addCookie(cookie);
     }
 

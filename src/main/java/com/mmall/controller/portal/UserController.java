@@ -9,6 +9,7 @@ import com.mmall.service.IUserService;
 import com.mmall.util.CookieUtil;
 import com.mmall.util.JsonUtil;
 import com.mmall.util.RedisPoolUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,15 +56,20 @@ public class UserController {
 
     /**
      * 用户登出
-     * @param session
+     * @param httpServletRequest
+     * @param httpServletResponse
      * @return
      */
     @RequestMapping(value = "logout.do",method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> logOut(HttpSession session,HttpServletRequest httpServletRequest,HttpServletResponse httpServletResponse){
-        session.removeAttribute(Const.CURRENT_USER);
-        //CookieUtil.readLoginLoken(httpServletRequest);
+    public ServerResponse<String> logOut(HttpServletRequest httpServletRequest,HttpServletResponse httpServletResponse){
+        //session.removeAttribute(Const.CURRENT_USER);
+        String loginToken = CookieUtil.readLoginLoken(httpServletRequest);
+        if (StringUtils.isBlank(loginToken))
+            return ServerResponse.createBySuccessMessage("您并未登录，无需登出");
         CookieUtil.delLoginToken(httpServletRequest,httpServletResponse);
+
+        RedisPoolUtil.del(loginToken);
         return ServerResponse.createBySuccess();
     }
 
@@ -92,13 +98,21 @@ public class UserController {
 
     /**
      * 获取用户信息
-     * @param session
+     * @param request
      * @return
      */
-    @RequestMapping(value = "get_user_info_from_session.do",method = RequestMethod.POST)
+    @RequestMapping(value = "get_user_info.do",method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<User> getUserInfoFromSession(HttpSession session){
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+    public ServerResponse<User> getUserInfo(HttpServletRequest request){
+        //User user = (User) session.getAttribute(Const.CURRENT_USER);
+        String loginToken = CookieUtil.readLoginLoken(request);
+        if (StringUtils.isBlank(loginToken)){
+            return ServerResponse.createByErrorMessage("用户尚未登录，无法获取用户相关信息");
+        }
+
+        String userStr = RedisPoolUtil.get(loginToken);
+        User user = JsonUtil.Json2Obj(userStr, User.class);
+
         if (user!=null){
             return ServerResponse.createBySuccess(user);
         }
@@ -146,8 +160,12 @@ public class UserController {
     //因为只输入用户名，可能登录状态下能把别人的密码改掉了
     @RequestMapping(value = "login_reset_password.do",method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> loginResetPassword(HttpSession session,String passwordOld,String passwordNew){
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+    public ServerResponse<String> loginResetPassword(HttpServletRequest request,String passwordOld,String passwordNew){
+        //User user = (User) session.getAttribute(Const.CURRENT_USER);
+        String loginToken = CookieUtil.readLoginLoken(request);
+        String userStr = RedisPoolUtil.get(loginToken);
+        User user = JsonUtil.Json2Obj(userStr, User.class);
+
         if (user==null){
             return  ServerResponse.createByErrorMessage("用户未登录");
         }
@@ -156,14 +174,19 @@ public class UserController {
 
     /**
      * 修改用户信息
-     * @param session
+     * @param request
      * @param alterUser
      * @return
      */
     @RequestMapping(value = "update_user_info.do",method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<User> updateUserInfo(HttpSession session,User alterUser){
-        User existUser = (User) session.getAttribute(Const.CURRENT_USER);
+    public ServerResponse<User> updateUserInfo(HttpServletRequest request,User alterUser){
+        //User existUser = (User) session.getAttribute(Const.CURRENT_USER);
+
+        String loginToken = CookieUtil.readLoginLoken(request);
+        String userStr = RedisPoolUtil.get(loginToken);
+        User existUser = JsonUtil.Json2Obj(userStr, User.class);
+
         if (existUser==null){
             return  ServerResponse.createByErrorMessage("用户未登录");
         }
@@ -174,7 +197,9 @@ public class UserController {
             //username不可修改
             infoResponse.getData().setUsername(existUser.getUsername());
             //session更新 更新后的用户信息
-            session.setAttribute(Const.CURRENT_USER,infoResponse.getData());
+            String logintToken = CookieUtil.readLoginLoken(request);
+            RedisPoolUtil.set(loginToken,JsonUtil.obj2Json(infoResponse.getData()));
+            //session.setAttribute(Const.CURRENT_USER,infoResponse.getData());
         }
         //将用户信息返回给前端，便于直接展示更新后的用户信息
         return infoResponse;
