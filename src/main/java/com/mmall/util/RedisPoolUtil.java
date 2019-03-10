@@ -3,10 +3,9 @@ package com.mmall.util;
 import com.mmall.common.RedisPool;
 import lombok.extern.slf4j.Slf4j;
 import redis.clients.jedis.Jedis;
+
 @Slf4j
 public class RedisPoolUtil {
-
-
     /**
      * 重设key的超时时间 ，单位s
      * @param key
@@ -106,4 +105,5 @@ public class RedisPoolUtil {
 
         System.out.println("end");
     }
+
 }

@@ -34,6 +34,8 @@
     <filter-name>characterEncodingFilter</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
+
+  <!--二期新增重置session有效期
   <filter>
     <filter-name>sessionExpireFilter</filter-name>
     <filter-class>com.mmall.controller.common.SessionExpireFilter</filter-class>
@@ -41,9 +43,20 @@
   <filter-mapping>
     <filter-name>sessionExpireFilter</filter-name>
     <url-pattern>*.do</url-pattern>
+  </filter-mapping>-->
+
+  <!--包含了expire(设置有效期)和包装现在httpsession (负责更换HttpSession) -->
+  <!--DelegatingFilterProxy  授权过滤器代理-->
+  <!--The DelegatingFilterProxy 会查找一个叫springSessionRepositoryFilter的bean并转为filter
+  每一个请求DelegatingFilterProxy被调用时(invoked), springSessionRepositoryFilter就会被调用.-->
+  <filter>
+    <filter-name>springSessionRepositoryFilter</filter-name>
+    <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>springSessionRepositoryFilter</filter-name>
+    <url-pattern>*.do</url-pattern>
   </filter-mapping>
-  
-  
 
   <listener>
     <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
