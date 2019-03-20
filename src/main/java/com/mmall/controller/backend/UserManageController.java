@@ -23,7 +23,7 @@ public class UserManageController {
     @Autowired
     private IUserService iUserService;
 
-    @RequestMapping(value = "login.do" , method = RequestMethod.POST)
+    @RequestMapping(value = "login.do" , method = RequestMethod.GET)
     @ResponseBody
     public ServerResponse<User> login(String username, String password, HttpSession session, HttpServletResponse httpServletResponse){
 
@@ -33,6 +33,7 @@ public class UserManageController {
             if (Const.Role.ROLE_ADMIN == user.getRole().intValue()){
                 //session.setAttribute(Const.CURRENT_USER,user);
 
+                //新增redis共享cookie，session的方式
                 CookieUtil.writeLoginToken(httpServletResponse,session.getId());
                 ShardedRedisPoolUtil.setEx(session.getId(), JsonUtil.obj2Json(response.getData()),Const.RedisCacheExtime.REDIS_SESSION_EXTIME);
                 return response;

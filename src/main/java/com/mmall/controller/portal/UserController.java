@@ -44,8 +44,8 @@ public class UserController {
         if (response.isSuccess()){
             //如果是成功登录的status，那么response就会有data，将成功登录的用户信息存入session
             //session.setAttribute(Const.CURRENT_USER,response.getData());
-            //33E451B8AC8F01F95DED9B55C44075D7
-            //B70915CC38AA5AE1D22C48D8869CA054
+            //单个Tomcat的时候，只要Tomcat不重启关闭，那么浏览器就会和Tomcat一直保持会话状态，因为访问会带上cookie，
+            // 而Tomcat判断完发现里面是有这个对应id的session，那就会一直分配这个session
             CookieUtil.writeLoginToken(httpServletResponse,session.getId());
 
             ShardedRedisPoolUtil.setEx(session.getId(), JsonUtil.obj2Json(response.getData()),Const.RedisCacheExtime.REDIS_SESSION_EXTIME);

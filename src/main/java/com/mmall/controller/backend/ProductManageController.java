@@ -42,7 +42,7 @@ public class ProductManageController {
     @RequestMapping("addProduct.do")
     @ResponseBody
     public ServerResponse addProduct(HttpServletRequest request, Product product){
-        String loginToken = CookieUtil.readLoginLoken(request);
+        /*String loginToken = CookieUtil.readLoginLoken(request);
         if (StringUtils.isBlank(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录");
         }
@@ -57,13 +57,17 @@ public class ProductManageController {
             //执行添加商品逻辑
             return iProductService.saveOrUpdateProduct(product);
         }
-        return ServerResponse.createByErrorMessage("该用户没有权限");
+        return ServerResponse.createByErrorMessage("该用户没有权限");*/
+
+        //全部通过拦截器验证是否登录以及权限
+        //执行添加商品逻辑
+        return iProductService.saveOrUpdateProduct(product);
     }
 
     @RequestMapping("productUpOrDown.do")
     @ResponseBody
     public ServerResponse productUpOrDown(HttpServletRequest request, Integer status,Integer productId){
-        String loginToken = CookieUtil.readLoginLoken(request);
+        /*String loginToken = CookieUtil.readLoginLoken(request);
         if (StringUtils.isBlank(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录");
         }
@@ -79,13 +83,17 @@ public class ProductManageController {
             //执行商品上下架逻辑
             return iProductService.productUpOrDown(status,productId);
         }
-        return ServerResponse.createByErrorMessage("该用户没有权限");
+        return ServerResponse.createByErrorMessage("该用户没有权限");*/
+
+        //全部通过拦截器验证是否登录以及权限
+        //执行商品上下架逻辑
+        return iProductService.productUpOrDown(status,productId);
     }
 
     @RequestMapping("get_product_detail.do")
     @ResponseBody
     public ServerResponse<ProductDetailVo> getProductDetail(HttpServletRequest request, Integer productId){
-        String loginToken = CookieUtil.readLoginLoken(request);
+        /*String loginToken = CookieUtil.readLoginLoken(request);
         if (StringUtils.isBlank(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录");
         }
@@ -100,13 +108,18 @@ public class ProductManageController {
             //获取商品详情逻辑
             return iProductService.getProductDetail(productId);
         }
-        return ServerResponse.createByErrorMessage("该用户没有权限");
+        return ServerResponse.createByErrorMessage("该用户没有权限");*/
+
+        //全部通过拦截器验证是否登录以及权限
+
+        //获取商品详情逻辑
+        return iProductService.getProductDetail(productId);
     }
 
     @RequestMapping("get_product_list.do")
     @ResponseBody
     public ServerResponse<PageInfo> getProductList(HttpServletRequest request, @RequestParam(value = "pageNum",defaultValue = "1") Integer pageNum, @RequestParam(value = "pageSize",defaultValue = "10")Integer pageSize){
-        String loginToken = CookieUtil.readLoginLoken(request);
+        /*String loginToken = CookieUtil.readLoginLoken(request);
         if (StringUtils.isBlank(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录");
         }
@@ -121,13 +134,17 @@ public class ProductManageController {
             //获取商品列表
             return iProductService.getProductList(pageNum,pageSize);
         }
-        return ServerResponse.createByErrorMessage("该用户没有权限");
+        return ServerResponse.createByErrorMessage("该用户没有权限");*/
+
+        //全部通过拦截器验证是否登录以及权限
+        //获取商品列表
+        return iProductService.getProductList(pageNum,pageSize);
     }
 
     @RequestMapping("search_product.do")
     @ResponseBody
     public ServerResponse searchProduct(HttpServletRequest request,String productName,Integer productId, @RequestParam(value = "pageNum",defaultValue = "1") Integer pageNum,  @RequestParam(value = "pageSize",defaultValue = "10")Integer pageSize){
-        String loginToken = CookieUtil.readLoginLoken(request);
+       /* String loginToken = CookieUtil.readLoginLoken(request);
         if (StringUtils.isBlank(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录");
         }
@@ -143,13 +160,16 @@ public class ProductManageController {
             //根据商品id或商品名搜索商品
             return iProductService.searchProduct(productName,productId,pageNum,pageSize);
         }
-        return ServerResponse.createByErrorMessage("该用户没有权限");
+        return ServerResponse.createByErrorMessage("该用户没有权限");*/
+        //全部通过拦截器验证是否登录以及权限
+        //根据商品id或商品名搜索商品
+        return iProductService.searchProduct(productName,productId,pageNum,pageSize);
     }
 
     @RequestMapping("upload_photo.do")
     @ResponseBody
     public ServerResponse uploadPhoto(@RequestParam(value = "uploadFile",required = false) MultipartFile file, HttpServletRequest request){
-        String loginToken = CookieUtil.readLoginLoken(request);
+        /*String loginToken = CookieUtil.readLoginLoken(request);
         if (StringUtils.isBlank(loginToken)){
             return ServerResponse.createByErrorMessage("用户未登录");
         }
@@ -176,14 +196,27 @@ public class ProductManageController {
             return ServerResponse.createBySuccess(map);
 //            return iFileService.uploadPhoto(file,request);
         }
-        return ServerResponse.createByErrorMessage("该用户没有权限");
+        return ServerResponse.createByErrorMessage("该用户没有权限");*/
+
+        String path = request.getSession().getServletContext().getRealPath("upload");
+        //返回上传图片的结果
+        Map map = Maps.newHashMap();
+        String targetFileName = iFileService.uploadPhoto(file,path);
+        if(StringUtils.isBlank(targetFileName)){
+            map.put("success",false);
+            map.put("msg","上传失败");
+            return ServerResponse.createByErrorMessage((String) map.get("msg"));
+        }
+        map.put("uri",targetFileName);
+        map.put("url", PropertiesUtil.getProperty("ftp.server.http.prefix")+targetFileName);
+        return ServerResponse.createBySuccess(map);
     }
 
     @RequestMapping("richtext_upload.do")
     @ResponseBody
-    public Map richtextUpload(HttpSession session, @RequestParam(value = "uploadFile",required = false) MultipartFile file, HttpServletRequest request, HttpServletResponse response){
-        Map map = Maps.newHashMap();
-        String loginToken = CookieUtil.readLoginLoken(request);
+    public Map richtextImgUpload(HttpSession session, @RequestParam(value = "uploadFile",required = false) MultipartFile file, HttpServletRequest request, HttpServletResponse response){
+        Map resultMap = Maps.newHashMap();
+        /*String loginToken = CookieUtil.readLoginLoken(request);
         if (StringUtils.isBlank(loginToken)){
             map.put("success",false);
             map.put("msg","请登录（以管理员身份）");
@@ -197,6 +230,12 @@ public class ProductManageController {
             map.put("msg","请登录（以管理员身份）");
             return map;
         }
+        //富文本中对于返回值有自己的要求,我们使用是simditor所以按照simditor的要求进行返回
+        //        {
+        //            "success": true/false,
+        //                "msg": "error message", # optional
+        //            "file_path": "[real file path]"
+        //        }
         //检查用户是否是管理员
         if (iUserService.checkAdmin(existUser).isSuccess()){
             //返回上传图片的结果
@@ -207,6 +246,7 @@ public class ProductManageController {
                 map.put("msg","上传失败");
                 return map;
             }
+
             map.put("success",true);
             map.put("msg","上传成功");
             map.put("file_path",PropertiesUtil.getProperty("ftp.server.http.prefix")+targetFileName);
@@ -214,10 +254,28 @@ public class ProductManageController {
             response.addHeader("Access-Control-Allow-Headers","X-File-Name");//在服务器响应客户端的时候，带上Access-Control-Allow-Origin头信息，是解决跨域的一种方法
 //            return iFileService.uploadPhoto(file,request);
             return map;
+        } else{
+            map.put("success",false);
+            map.put("msg","此用户没有权限");
+        }*/
+
+
+        //返回上传图片的结果
+        String path = request.getSession().getServletContext().getRealPath("upload");
+        String targetFileName = iFileService.uploadPhoto(file, path);
+        if(StringUtils.isBlank(targetFileName)){
+            resultMap.put("success",false);
+            resultMap.put("msg","上传失败");
+            return resultMap;
         }
-        map.put("success",false);
-        map.put("msg","此用户没有权限");
-        return map;
+
+        resultMap.put("success",true);
+        resultMap.put("msg","上传成功");
+        resultMap.put("file_path",PropertiesUtil.getProperty("ftp.server.http.prefix")+targetFileName);
+        //在服务器响应客户端的时候，带上Access-Control-Allow-Origin头信息，是解决跨域的一种方法
+        response.addHeader("Access-Control-Allow-Headers","X-File-Name");
+//            return iFileService.uploadPhoto(file,request);
+        return resultMap;
     }
 
 

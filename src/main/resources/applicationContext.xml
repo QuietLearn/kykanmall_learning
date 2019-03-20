@@ -9,9 +9,15 @@
      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
      http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
 
-    <context:component-scan base-package="com.mmall" annotation-config="true"/>
+    <!--包扫描，在这个包扫描中加了这个节点annotation-config为true,下面这个就用不上了，同理的 -->
+    <!--spring容器中扫描时不应该扫描controller，应该交给dispatcher-servlet-->
+    <context:component-scan base-package="com.mmall" annotation-config="true">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
 
+    <!--激活已经注册的bean(xml或注解),让已经注册的bean能够工作，例如注入到其他类的内部(属性)-->
     <!--<context:annotation-config/>-->
+
     <aop:aspectj-autoproxy/>
 
     <!--spring容器启动的时候就会加载spring-session.xml-->

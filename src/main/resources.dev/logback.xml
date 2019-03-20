@@ -48,6 +48,7 @@
         </filter>
     </appender>
 
+    <!--其中additivity="false"，导致此logger的打印信息不向上级传递，即root 根logger未接收到任何日志信息-->
     <logger name="com.mmall" additivity="false" level="INFO" >
         <appender-ref ref="mmall" />
         <appender-ref ref="console"/>
@@ -74,7 +75,9 @@
         <!--<appender-ref ref="console"/>-->
     <!--</logger>-->
 
-
+    <!--如果没有 logger 的话，打印是会进入 root 下的 appender 的，但是若果添加了 logger，
+    root 的打印就根据 logger 来了，如果 logger 不传递，那 root 也没有打印了-->
+    <!--将root节点中<appender-ref ref="console"/>设置给注释，否则控制台会打印两次日志信息-->
     <root level="DEBUG">
         <appender-ref ref="console"/>
         <appender-ref ref="error"/>

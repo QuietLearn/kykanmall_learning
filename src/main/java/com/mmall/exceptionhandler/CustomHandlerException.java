@@ -8,12 +8,23 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.mmall.exception.MyException;
+import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.json.MappingJacksonJsonView;
 
 
 public class CustomHandlerException implements HandlerExceptionResolver{
-	
+
+	/**
+	 *
+	 * @param request
+	 * @param response
+	 * @param object 具体的一个handler
+	 * @param e
+	 * @return 因为是前后端分离的，所以不需要转到一个view，将其转为json
+	 * 例如写一个页面，是个异常页面，然后从服务器跳转到那个页面
+	 */
 	@Override
 	public ModelAndView resolveException(HttpServletRequest request, 
 			HttpServletResponse response, 
@@ -39,7 +50,7 @@ public class CustomHandlerException implements HandlerExceptionResolver{
 		// 返回错误页面，给用户友好页面显示错误信息
 		ModelAndView modelAndView = new ModelAndView();
 		modelAndView.addObject("msg", message);
-		modelAndView.setViewName("error");
+//		modelAndView.setViewName("error");
 
 		return modelAndView;
 

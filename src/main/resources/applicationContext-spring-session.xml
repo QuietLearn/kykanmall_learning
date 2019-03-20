@@ -24,7 +24,7 @@
         <property name="cookiePath" value="/"/>
         <property name="useHttpOnlyCookie" value="true"/>
         <!--tomcat8.5不支持.happymmall.com-->
-        <property name="domainName" value=".happymmall.com"/>
+        <property name="domainName" value="www.happymmall.com"/>
         <property name="cookieMaxAge" value="31536000" />
     </bean>
     <!--将Spring Session连接到Redis Server的程序 实现单点登录-->

@@ -8,7 +8,16 @@
 	http://www.springframework.org/schema/mvc
 	http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
-    <context:component-scan base-package="com.mmall" annotation-config="true"/>
+    <!--springmvc的配置文件来扫描controller-->
+    <!--spring容器中去扫描所有的bean-->
+    <!--spring与springmvc扫描包(配置文件)隔离-->
+    <!--spring本身在扫描的时候会有一个默认扫描-->
+    <!--base-package设置为controller 精准度更高-->
+    <context:component-scan base-package="com.mmall.controller" annotation-config="true" use-default-filters="false">
+        <!--白名单-->
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
 
     <!--注解驱动-->
     <mvc:annotation-driven>
@@ -21,9 +30,14 @@
                     </list>
                 </property>
             </bean>
+
+            <!--通过springmvc的jackson插件来控制实现json序列化
+            因为通过拦截器拦截上之后，就不再走mappingjackson啦，需要自己来序列化，达到同样的效果，这样对于前端来说是0感知。
+            前端不必之后咱们后端的数据怎么处理的，和之前的接口定义一致即可。-->
             <bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
                 <property name="supportedMediaTypes">
                     <list>
+                        <!--springmvc的配置文件配置的contentType-->
                         <value>application/json;charset=UTF-8</value>
                     </list>
                 </property>
@@ -40,5 +54,23 @@
         <property name="defaultEncoding" value="UTF-8"></property>
     </bean>
 
+    <mvc:interceptors>
+        <!--因为是s,如果在这里直接配置bean声明拦截器，代表定义在这里是吧所有的都会拦截-->
+        <!--所有的请求都会被interceptors复数里面的bean进行一个拦截  <bean></bean>-->
+        <mvc:interceptor>
+            <!--按规定，否则拦截不到-->
+            <!--manage/a.do  /manage/*  包目录-->
+            <!--manage/b.do  /manage/*-->
+            <!--manage/product/save.do /manage/** 包目录和子目录-->
+            <!--manage/order/detail.do /manage/**-->
+            <!--/web项目的根目录请求-->
+            <!--/manage-->
+            <mvc:mapping path="/**"/>
+
+            <mvc:exclude-mapping path="/manage/user/login.do"/>
+            <!--指定到我们创建的拦截器上-->
+            <bean class="com.mmall.controller.common.interceptor.AuthorityInterceptor"></bean>
+        </mvc:interceptor>
+    </mvc:interceptors>
 
 </beans>
